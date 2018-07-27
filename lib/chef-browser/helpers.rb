@@ -11,6 +11,19 @@ module ChefBrowser
       @chef_server ||= settings.rb.ridley
     end
 
+    def can_login?(username, password)
+      login_url = "#{URI(settings.rb.server_url).scheme}://#{URI(settings.rb.server_url).host}/login"
+      uri = URI(login_url)
+
+      req = Net::HTTP::Post.new(uri)
+      req.set_form_data('username' => username, 'password' => password)
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+
+      http.request(req).code.to_i == 302
+    end
+
     def authorized?
       session[:authorized]
     end

@@ -18,10 +18,11 @@ gem "rubysl", "~> 2.0", platforms: :rbx
 gem 'rugged'
 gem "sinatra"
 gem "tinyconfig", "~> 0.1"
+gem 'chef', "~> 12"
 
 group :development do
   gem "capybara"
-  gem "chef-zero", "~> 14.0.0"
+  gem "chef-zero", "~> 5"
   gem "cucumber"
   gem "ffi"
   gem "pry"

@@ -15,6 +15,12 @@ require 'chef-browser/version'
 require 'chef-browser/file_content'
 require 'chef-browser/helpers'
 
+require 'net/http'
+require 'json'
+require 'chef/config'
+require 'chef/key'
+require 'chef/server_api'
+
 module ChefBrowser
   class App < Sinatra::Base
     include Erubis::XmlHelper
@@ -83,8 +89,32 @@ module ChefBrowser
       erb :login_form, layout: :login_layout, locals: { wrong: false }
     end
 
+    get '/user/?' do
+      user_name = session[:authorized]
+      locals = { user_name: user_name, private_key: nil }
+
+      if params[:reset_key]
+        Chef::Config[:chef_server_url] = settings.rb.server_url
+        Chef::Config[:client_name] = user_name
+        Chef::Config[:node_name] = user_name
+        Chef::Config[:client_key] = settings.rb.client_key
+        Chef::Config[:ssl_verify] = :none
+
+        key = Chef::Key.from_hash(
+          'user' => session[:authorized],
+          'create_key' => true,
+          'name' => 'new'
+        )
+        key = Chef::Key.list_by_user(user_name, true).has_key?('new') ? key.update : key.create
+
+        locals[:private_key] = key.private_key
+      end
+
+      erb :user_form, layout: :layout, locals: locals
+    end
+
     post '/login/?' do
-      if chef_server.user.authenticate(params['username'], params['password'])
+      if can_login?(params['username'], params['password'])
         session[:authorized] = params['username']
         redirect url '/'
       else

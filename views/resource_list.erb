@@ -10,8 +10,9 @@
 <p class="lead">Search results (<%= resources.length %>)</p>
 <%   end -%>
 <% end -%>
-<ul class="list-unstyled">
+
 <% if resources.class == Hash -%>
+<ul class="list-unstyled">
 <%   resources.sort.each do |cookbook, versions| -%>
   <li><%= cookbook %>
 <%     versions.sort_by { |ver| Semverse::Version.new(ver) }.reverse.each do |version| -%>
@@ -19,9 +20,13 @@
 <%     end -%>
   </li>
 <%   end -%>
-<% else -%>
-<%   resources.sort.each do |resource| -%>
-  <li><a href='<%= url resource.url %>'><%= resource.chef_id || resource.name %></a></li>
-<%   end -%>
-<% end -%>
 </ul>
+<% else -%>
+  <div class="filterable">
+    <table class="table table-condensed table-striped table-hover">
+      <%   resources.sort.each do |resource| -%>
+        <tr><td><a href='<%= url resource.url %>'><%= resource.chef_id || resource.name %></a></td></tr>
+      <%   end -%>
+    </table>
+  </div>
+<% end -%>

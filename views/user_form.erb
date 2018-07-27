@@ -1,0 +1,12 @@
+<h3>User - <%= user_name %></h3>
+
+<% unless private_key %>
+  <a href="<%= url '/user/' %>?reset_key=true" class="btn btn-danger btn-lg">Reset Key</a>
+<% end %>
+<% if private_key %>
+  <strong>Please save your new private key</strong>
+
+<pre>
+<%= private_key %>
+</pre>
+<% end %>
